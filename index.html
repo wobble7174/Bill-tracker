@@ -339,6 +339,10 @@
       <label>Note</label>
       <input type="text" id="editNote" maxlength="60">
     </div>
+    <div class="modal-field" id="editEndDateWrap" style="display:none">
+      <label>End Date (series)</label>
+      <input type="date" id="editEndDate">
+    </div>
     <div class="modal-paid-row">
       <div class="toggle-wrap" onclick="toggleEditPaid()">
         <div class="toggle-track" id="editPaidTrack"><div class="toggle-thumb"></div></div>
@@ -619,6 +623,18 @@ function openEdit(id) {
   document.getElementById('editPaidTrack').classList.toggle('on', e.paid);
   document.getElementById('editModalTitle').textContent = e.seriesId ? 'Edit Recurring Entry' : 'Edit Entry';
   document.getElementById('editModalSub').textContent   = e.seriesId ? 'Part of a recurring series' : '';
+  // Show end date field only for recurring entries
+  const endDateWrap = document.getElementById('editEndDateWrap');
+  if (e.seriesId) {
+    endDateWrap.style.display = 'block';
+    // Find the last unpaid entry in this series to pre-fill end date
+    const seriesEntries = state.entries.filter(x => x.seriesId === e.seriesId && !x.paid);
+    const lastDate = seriesEntries.reduce((max, x) => x.date > max ? x.date : max, '');
+    document.getElementById('editEndDate').value = lastDate || '';
+  } else {
+    endDateWrap.style.display = 'none';
+    document.getElementById('editEndDate').value = '';
+  }
   document.getElementById('editModal').classList.add('open');
 }
 function toggleEditPaid() {
@@ -631,7 +647,8 @@ function submitEdit() {
   const note   = document.getElementById('editNote').value.trim();
   if (isNaN(amount)) { shake('editAmount'); return; }
 
-  pendingEdit = { id: editingId, amount, date, note, paid: editPaidVal };
+  const editEndDate = document.getElementById('editEndDate').value || null;
+  pendingEdit = { id: editingId, amount, date, note, paid: editPaidVal, editEndDate };
   const e = state.entries.find(x => x.id === editingId);
   closeModal('editModal');
 
@@ -649,11 +666,21 @@ function applyRecurChoice(scope) {
   if (scope === 'one') {
     if (orig) { orig.amount = amount; orig.date = date; orig.note = note; orig.paid = paid; }
   } else {
+    const { editEndDate } = pendingEdit;
     // update this + all future unpaid in same series
+    // if end date set, remove entries beyond it
+    if (editEndDate) {
+      state.entries = state.entries.filter(e => {
+        if (e.seriesId !== orig.seriesId) return true;
+        if (e.paid) return true;
+        if (e.date <= editEndDate) return true;
+        return false; // remove unpaid entries beyond new end date
+      });
+    }
     state.entries.forEach(e => {
       if (e.seriesId !== orig.seriesId) return;
-      if (e.paid && e.id !== id) return; // skip already paid unless it's the one being edited
-      if (e.date < orig.date) return;    // skip past entries in series
+      if (e.paid && e.id !== id) return;
+      if (e.date < orig.date) return;
       e.amount = amount;
       e.note   = note;
       if (e.id === id) { e.date = date; e.paid = paid; }
