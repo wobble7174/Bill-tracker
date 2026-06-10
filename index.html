@@ -335,13 +335,13 @@
       <label>Date</label>
       <input type="date" id="editDate">
     </div>
-    <div class="modal-field">
-      <label>Note</label>
-      <input type="text" id="editNote" maxlength="60">
-    </div>
     <div class="modal-field" id="editEndDateWrap" style="display:none">
       <label>End Date (series)</label>
       <input type="date" id="editEndDate">
+    </div>
+    <div class="modal-field">
+      <label>Note</label>
+      <input type="text" id="editNote" maxlength="60">
     </div>
     <div class="modal-paid-row">
       <div class="toggle-wrap" onclick="toggleEditPaid()">
@@ -370,6 +370,20 @@
       <div class="choice-desc">Updates every unpaid entry in this series from this date forward</div>
     </button>
     <button class="btn-cancel-full" onclick="closeModal('recurChoiceModal')">Cancel</button>
+  </div>
+</div>
+
+<!-- END DATE CONFIRM MODAL -->
+<div class="modal-overlay" id="endDateConfirmModal">
+  <div class="modal">
+    <h3>Update Series End Date</h3>
+    <p class="modal-sub" style="font-size:0.85rem;line-height:1.5;color:var(--text)">
+      This will remove all unpaid entries in this series beyond the new end date. This cannot be undone.
+    </p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('endDateConfirmModal')">Cancel</button>
+      <button class="btn-confirm" onclick="applyEndDateChange()">Update Series</button>
+    </div>
   </div>
 </div>
 
@@ -404,8 +418,8 @@ function load() {
     if (raw) state = JSON.parse(raw);
     state.entries.forEach(e => {
       if (e.paid === undefined) e.paid = false;
-      if (e.seriesId === undefined) e.seriesId = null;
-      if (e.interval === undefined) e.interval = null;
+      if (!e.seriesId) e.seriesId = null;  // treat empty string as null
+      if (!e.interval) e.interval = null;
     });
   } catch(e) {}
   document.getElementById('inputDate').value = todayISO();
@@ -650,14 +664,48 @@ function submitEdit() {
   const editEndDate = document.getElementById('editEndDate').value || null;
   pendingEdit = { id: editingId, amount, date, note, paid: editPaidVal, editEndDate };
   const e = state.entries.find(x => x.id === editingId);
+
+  // Detect if only the end date changed vs other fields
+  const origEndDate = (() => {
+    if (!e || !e.seriesId) return null;
+    const seriesEntries = state.entries.filter(x => x.seriesId === e.seriesId && !x.paid);
+    return seriesEntries.reduce((max, x) => x.date > max ? x.date : max, '');
+  })();
+  const endDateChanged  = e && e.seriesId && editEndDate !== origEndDate;
+  const otherChanged    = e && (Math.abs(e.amount) !== Math.abs(amount) ||
+                          e.note !== note || e.date !== date || e.paid !== editPaidVal);
+
   closeModal('editModal');
 
-  if (e && e.seriesId) {
-    document.getElementById('recurChoiceModal').classList.add('open');
+  if (e && e.seriesId && e.seriesId !== '') {
+    if (endDateChanged && !otherChanged) {
+      // Only end date changed — show warning and apply to whole series
+      document.getElementById('endDateConfirmModal').classList.add('open');
+    } else {
+      // Other fields changed — ask just this one or all future
+      document.getElementById('recurChoiceModal').classList.add('open');
+    }
   } else {
     applyRecurChoice('one');
   }
 }
+function applyEndDateChange() {
+  if (!pendingEdit) { closeModal('endDateConfirmModal'); return; }
+  const { id, editEndDate } = pendingEdit;
+  const orig = state.entries.find(x => x.id === id);
+  if (orig && orig.seriesId && editEndDate) {
+    state.entries = state.entries.filter(e => {
+      if (e.seriesId !== orig.seriesId) return true;
+      if (e.paid) return true;
+      return e.date <= editEndDate;
+    });
+  }
+  pendingEdit = null;
+  closeModal('endDateConfirmModal');
+  save(); render();
+  showToast('Series end date updated');
+}
+
 function applyRecurChoice(scope) {
   if (!pendingEdit) { closeModal('recurChoiceModal'); return; }
   const { id, amount, date, note, paid } = pendingEdit;
@@ -858,8 +906,8 @@ function importCSV(event) {
           note:     cols[1] || '',
           amount,
           paid:     (cols[3]||'').toLowerCase() === 'yes',
-          seriesId: cols[4] || null,
-          interval: cols[5] || null
+          seriesId: cols[4] && cols[4].trim() ? cols[4].trim() : null,
+          interval: cols[5] && cols[5].trim() ? cols[5].trim() : null
         });
       });
       state.starting = newStarting;
