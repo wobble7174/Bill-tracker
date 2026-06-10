@@ -90,6 +90,30 @@
   .sign-toggle.negative { background: rgba(242,107,107,0.15); border-color: var(--negative); color: var(--negative); }
   .sign-toggle.positive { background: rgba(62,207,142,0.15); border-color: var(--positive); color: var(--positive); }
 
+  .add-entry-toggle {
+    display: block;
+    width: calc(100% - 2rem);
+    margin: 0.75rem 1rem 0;
+    padding: 0.8rem;
+    background: var(--surface);
+    border: 1px dashed var(--muted);
+    border-radius: 12px;
+    color: var(--accent);
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .add-entry-toggle:active { background: var(--border); }
+  .add-entry-toggle.open {
+    border-style: solid;
+    border-color: var(--accent);
+    color: var(--sub);
+  }
+
   .add-btn { width: 100%; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-family: var(--sans); font-size: 0.9rem; font-weight: 600; padding: 0.7rem; cursor: pointer; margin-top: 0.25rem; transition: opacity 0.15s, transform 0.1s; -webkit-tap-highlight-color: transparent; }
   .add-btn:active { opacity: 0.85; transform: scale(0.98); }
 
@@ -177,14 +201,17 @@
 <!-- HEADER -->
 <div class="header">
   <div class="header-top">
-    <div>
-      <div class="header-label">Current Balance</div>
-      <div class="balance-display" id="mainBalance">$0.00</div>
-    </div>
     <div class="starting-wrap">
       <div class="header-label">Starting</div>
       <div class="starting-val" id="startingDisplay">$0.00</div>
       <button class="edit-start-btn" onclick="openStartModal()">edit</button>
+    </div>
+    <div style="text-align:right">
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:0.4rem;">
+        <div class="header-label">Future Balance</div>
+        <button class="info-btn" onclick="openInfoModal()" title="What is Future Balance?">?</button>
+      </div>
+      <div class="balance-display" id="mainBalance">$0.00</div>
     </div>
   </div>
 </div>
@@ -205,8 +232,9 @@
 <input type="file" id="importInput" accept=".csv" style="display:none" onchange="importCSV(event)">
 
 <!-- ENTRY FORM -->
-<div class="form-card">
-  <div class="form-title">Add Entry</div>
+<button class="add-entry-toggle" id="addEntryToggle" onclick="toggleForm()">＋ Add Entry</button>
+<div class="form-card" id="formCard" style="display:none">
+  <div class="form-title">New Entry</div>
   <div class="form-row">
     <div class="sign-row">
       <div class="field">
@@ -239,8 +267,14 @@
       </select>
     </div>
   </div>
+  <div class="form-row" id="recurEndWrap" style="display:none">
+    <div class="field">
+      <label>End Date (optional)</label>
+      <input type="date" id="recurEndDate">
+    </div>
+  </div>
   <button class="add-btn" onclick="addEntry()">Add Entry</button>
-</div>
+</div><!-- /form-card -->
 
 <!-- LEDGER -->
 <div class="section-header">
@@ -254,6 +288,21 @@
   <button class="filter-btn f-pastdue"         onclick="setFilter('pastdue')">Past Due</button>
 </div>
 <div class="ledger" id="ledger"></div>
+
+<!-- INFO MODAL -->
+<div class="modal-overlay" id="infoModal">
+  <div class="modal">
+    <h3>Future Balance</h3>
+    <p class="modal-sub" style="font-size:0.85rem;line-height:1.5;color:var(--text)">
+      This is your projected balance after all scheduled transactions — including future recurring bills and deposits — have been applied.<br><br>
+      It is <strong>not</strong> your balance today. It reflects every entry in your ledger, paid or unpaid, past or future.<br><br>
+      To see what you have right now, look at entries up to today's date in the ledger.
+    </p>
+    <div class="modal-btns">
+      <button class="btn-confirm" onclick="closeModal('infoModal')">Got it</button>
+    </div>
+  </div>
+</div>
 
 <!-- START BALANCE MODAL -->
 <div class="modal-overlay" id="startModal">
@@ -394,14 +443,15 @@ function addDays(isoDate, n) {
   d.setDate(d.getDate() + n);
   return d.toISOString().slice(0,10);
 }
-function generateRecurringDates(startDate, interval) {
+function generateRecurringDates(startDate, interval, endDate) {
   const dates = [];
-  const twoYearsOut = addMonths(todayISO(), 24);
+  const defaultEnd = addMonths(todayISO(), 24);
+  const cutoff = endDate && endDate > startDate ? endDate : defaultEnd;
   let current = startDate;
   dates.push(current);
   while (true) {
     const next = interval === 'monthly' ? addMonths(current, 1) : addDays(current, 14);
-    if (next > twoYearsOut) break;
+    if (next > cutoff) break;
     dates.push(next);
     current = next;
   }
@@ -413,6 +463,26 @@ function toggleRecurring() {
   recurringOn = !recurringOn;
   document.getElementById('recurTrack').classList.toggle('on', recurringOn);
   document.getElementById('recurSelectWrap').style.display = recurringOn ? 'block' : 'none';
+  document.getElementById('recurEndWrap').style.display = recurringOn ? 'grid' : 'none';
+}
+
+// ── FORM TOGGLE ──
+function toggleForm() {
+  const card = document.getElementById('formCard');
+  const btn  = document.getElementById('addEntryToggle');
+  const isOpen = card.style.display !== 'none';
+  card.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '＋ Add Entry' : '✕ Cancel';
+  btn.classList.toggle('open', !isOpen);
+  if (!isOpen) {
+    setTimeout(() => document.getElementById('inputAmount').focus(), 100);
+  }
+}
+function closeForm() {
+  document.getElementById('formCard').style.display = 'none';
+  const btn = document.getElementById('addEntryToggle');
+  btn.textContent = '＋ Add Entry';
+  btn.classList.remove('open');
 }
 
 // ── SIGN TOGGLES ──
@@ -463,8 +533,9 @@ function addEntry() {
 
   if (recurringOn) {
     const interval = document.getElementById('recurInterval').value;
+    const endDate  = document.getElementById('recurEndDate').value || null;
     const seriesId = uid();
-    const dates = generateRecurringDates(date, interval);
+    const dates = generateRecurringDates(date, interval, endDate);
     dates.forEach(d => {
       state.entries.push({ id: uid(), amount, date: d, note, paid: false, seriesId, interval });
     });
@@ -693,6 +764,10 @@ function render() {
 }
 
 // ── STARTING BALANCE ──
+function openInfoModal() {
+  document.getElementById('infoModal').classList.add('open');
+}
+
 function openStartModal() {
   document.getElementById('startInput').value = state.starting || '';
   document.getElementById('startModal').classList.add('open');
