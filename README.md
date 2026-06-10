@@ -31,7 +31,8 @@ A lightweight, mobile-friendly personal bill tracker that runs entirely in your 
 1. Fill in the amount, date (use the actual due date, e.g. the 14th), and note
 2. Toggle **Recurring** on
 3. Choose **Monthly** or **Every 2 Weeks**
-4. Tap **Add Entry** — 2 years of entries are created automatically
+4. Optionally set an **End Date** — leave blank to default to 2 years out
+5. Tap **Add Entry** — entries are created automatically through the end date
 
 ### Editing a Recurring Entry
 - Tap **edit** on any recurring entry

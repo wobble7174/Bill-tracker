@@ -2,6 +2,13 @@
 
 All notable changes to Bill Tracker are documented here.
 
+## [1.5.0] — 2026-06-10
+### Added
+- End date field for recurring entries — leave blank to default to 2 years, or set a specific stop date
+- Future Balance replaces Current Balance — smaller display with a ? info button explaining what the number represents
+- Form collapses after adding an entry so you return directly to the ledger
+- +/− toggle button opens as collapsed by default; tap ＋ Add Entry to expand
+
 ## [1.4.0] — 2026-06-09
 ### Added
 - +/− toggle button next to amount field for easy negative entry on iPhone number pad
