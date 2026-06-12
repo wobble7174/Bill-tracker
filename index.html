@@ -1010,27 +1010,61 @@ function importCSV(event) {
       const lines = e.target.result.split('\n').map(l => l.trim()).filter(l => l);
       const newAccounts = [];
       const newEntries  = [];
+      let legacyStarting = null; // for old BILLTRACKER_STARTING format
+
       lines.forEach(line => {
         const cols = parseCSVLine(line);
         if (!cols.length) return;
+
+        // New format: account definition row
         if (cols[0] === 'BILLTRACKER_ACCOUNT') {
           newAccounts.push({ id: cols[1], name: cols[2], starting: parseFloat(cols[3])||0 });
           return;
         }
+
+        // Old format: single starting balance row
+        if (cols[0] === 'BILLTRACKER_STARTING') {
+          legacyStarting = parseFloat(cols[1]) || 0;
+          return;
+        }
+
+        // Skip header row
         if (cols[0] === 'Date') return;
+
         const amount = parseFloat(cols[2]);
         if (isNaN(amount)) return;
+
+        // Old format had: Date, Note, Amount, Paid, SeriesId, Interval (6 cols)
+        // New format has: Date, Note, Amount, Paid, SeriesId, Interval, AccountId, AccountName, RunningBal
         newEntries.push({
-          id: uid(), date: cols[0]||'', note: cols[1]||'', amount,
-          paid: (cols[3]||'').toLowerCase()==='yes',
-          seriesId: cols[4]&&cols[4].trim() ? cols[4].trim() : null,
-          interval:  cols[5]&&cols[5].trim() ? cols[5].trim() : null,
-          accountId: cols[6]&&cols[6].trim() ? cols[6].trim() : null
+          id:       uid(),
+          date:     cols[0] || '',
+          note:     cols[1] || '',
+          amount,
+          paid:     (cols[3]||'').toLowerCase() === 'yes',
+          seriesId: cols[4] && cols[4].trim() ? cols[4].trim() : null,
+          interval: cols[5] && cols[5].trim() ? cols[5].trim() : null,
+          accountId: cols[6] && cols[6].trim() ? cols[6].trim() : null
         });
       });
-      if (newAccounts.length === 0) newAccounts.push({ id: uid(), name: 'Main Account', starting: 0 });
-      // Assign orphaned entries to first account
-      newEntries.forEach(e => { if (!e.accountId || !newAccounts.find(a => a.id === e.accountId)) e.accountId = newAccounts[0].id; });
+
+      // If no account rows found, this is an old-format CSV — create a default account
+      if (newAccounts.length === 0) {
+        const defaultId = uid();
+        newAccounts.push({
+          id: defaultId,
+          name: 'Main Account',
+          starting: legacyStarting !== null ? legacyStarting : 0
+        });
+      }
+
+      // Assign any entries with missing or unrecognized accountId to the first account
+      newEntries.forEach(e => {
+        if (!e.accountId || !newAccounts.find(a => a.id === e.accountId)) {
+          e.accountId = newAccounts[0].id;
+        }
+      });
+
       state.accounts = newAccounts;
       state.entries  = newEntries;
       activeAccountId = newAccounts[0].id;
