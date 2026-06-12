@@ -21,30 +21,75 @@
     --mono:     'JetBrains Mono', monospace;
     --sans:     'Inter', sans-serif;
   }
-  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100dvh; padding-bottom: 2rem; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100dvh; padding-bottom: 3rem; }
 
-  /* HEADER */
-  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 1.25rem 0.875rem; position: sticky; top: 0; z-index: 10; }
-  .header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
-  .header-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sub); margin-bottom: 0.2rem; }
-  .balance-display { font-family: var(--mono); font-size: 2rem; font-weight: 600; line-height: 1; transition: color 0.3s; }
-  .balance-display.pos { color: var(--positive); }
-  .balance-display.neg { color: var(--negative); }
-  .starting-wrap { text-align: right; }
-  .starting-val { font-family: var(--mono); font-size: 0.95rem; color: var(--sub); }
-  .edit-start-btn { background: none; border: none; color: var(--accent); font-size: 0.72rem; cursor: pointer; padding: 0; font-family: var(--sans); display: block; text-align: right; margin-top: 0.1rem; }
+  /* ── HEADER ── */
+  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.875rem 1.25rem; position: sticky; top: 0; z-index: 10; }
+  .header-top { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; }
 
-  /* ACTION BUTTONS */
+  /* Account selector */
+  .account-selector { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 0; }
+  .account-select {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-family: var(--sans); font-size: 0.9rem; font-weight: 600;
+    padding: 0.45rem 0.65rem; outline: none; -webkit-appearance: none; cursor: pointer;
+    flex: 1; min-width: 0; max-width: 160px;
+  }
+  .account-select:focus { border-color: var(--accent); }
+  .manage-btn {
+    background: none; border: 1px solid var(--border); border-radius: 7px;
+    color: var(--sub); font-family: var(--sans); font-size: 0.72rem; font-weight: 500;
+    padding: 0.4rem 0.6rem; cursor: pointer; white-space: nowrap;
+    -webkit-tap-highlight-color: transparent; transition: color 0.15s, border-color 0.15s;
+  }
+  .manage-btn:active { color: var(--text); border-color: var(--muted); }
+
+  /* Combined balance */
+  .combined-balance { text-align: right; flex-shrink: 0; }
+  .combined-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); margin-bottom: 0.1rem; }
+  .combined-val { font-family: var(--mono); font-size: 1.25rem; font-weight: 600; line-height: 1; }
+  .combined-val.pos { color: var(--positive); }
+  .combined-val.neg { color: var(--negative); }
+
+  /* ── ACTION BUTTONS ── */
   .action-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 1rem 1rem 0; }
-  .action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; padding: 1rem 0.75rem; border-radius: 12px; border: none; font-family: var(--sans); cursor: pointer; transition: opacity 0.15s, transform 0.1s; -webkit-tap-highlight-color: transparent; line-height: 1; }
+  .action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.875rem 0.75rem; border-radius: 12px; border: none; font-family: var(--sans); cursor: pointer; transition: opacity 0.15s, transform 0.1s; -webkit-tap-highlight-color: transparent; line-height: 1; }
   .action-btn:active { opacity: 0.82; transform: scale(0.97); }
-  .action-btn .btn-icon { font-size: 1.5rem; }
+  .action-btn .btn-icon { font-size: 1.4rem; }
   .action-btn .btn-label { font-size: 0.82rem; font-weight: 600; }
   .action-btn .btn-sub { font-size: 0.68rem; font-weight: 400; opacity: 0.75; }
   .btn-upload { background: var(--accent); color: #fff; }
   .btn-download { background: var(--positive); color: #0f1117; }
 
-  /* FORM */
+  /* ── ACCOUNT CURRENT BALANCE BAR ── */
+  .acct-balance-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 0.875rem 1rem 0; padding: 0.75rem 1rem;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  }
+  .acct-balance-left { }
+  .acct-balance-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); margin-bottom: 0.2rem; }
+  .acct-balance-name { font-size: 0.8rem; color: var(--muted); }
+  .acct-balance-val { font-family: var(--mono); font-size: 1.5rem; font-weight: 600; line-height: 1; }
+  .acct-balance-val.pos { color: var(--positive); }
+  .acct-balance-val.neg { color: var(--negative); }
+  .acct-starting { text-align: right; }
+  .acct-starting-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); margin-bottom: 0.2rem; }
+  .acct-starting-val { font-family: var(--mono); font-size: 0.85rem; color: var(--sub); }
+  .edit-start-btn { background: none; border: none; color: var(--accent); font-size: 0.7rem; cursor: pointer; padding: 0; font-family: var(--sans); display: block; text-align: right; margin-top: 0.15rem; }
+
+  /* ── ADD ENTRY TOGGLE ── */
+  .add-entry-toggle {
+    display: block; width: calc(100% - 2rem); margin: 0.75rem 1rem 0;
+    padding: 0.8rem; background: var(--surface); border: 1px dashed var(--muted);
+    border-radius: 12px; color: var(--accent); font-family: var(--sans);
+    font-size: 0.9rem; font-weight: 600; cursor: pointer; text-align: center;
+    -webkit-tap-highlight-color: transparent; transition: border-color 0.15s, background 0.15s;
+  }
+  .add-entry-toggle:active { background: var(--border); }
+  .add-entry-toggle.open { border-style: solid; border-color: var(--accent); color: var(--sub); }
+
+  /* ── FORM ── */
   .form-card { margin: 0.75rem 1rem 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
   .form-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); margin-bottom: 0.875rem; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem; margin-bottom: 0.625rem; }
@@ -54,8 +99,11 @@
   .field input:focus, .field select:focus { border-color: var(--accent); }
   .field input::placeholder { color: var(--muted); }
   .field select option { background: var(--surface); }
-
-  /* RECURRING TOGGLE */
+  .sign-row { display: flex; gap: 0.5rem; align-items: flex-end; }
+  .sign-row .field { flex: 1; }
+  .sign-toggle { flex-shrink: 0; width: 3rem; height: 2.65rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 1.1rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.15s, border-color 0.15s; }
+  .sign-toggle.negative { background: rgba(242,107,107,0.15); border-color: var(--negative); color: var(--negative); }
+  .sign-toggle.positive { background: rgba(62,207,142,0.15); border-color: var(--positive); color: var(--positive); }
   .recurring-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.625rem; }
   .toggle-wrap { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .toggle-track { width: 2.25rem; height: 1.25rem; border-radius: 20px; background: var(--muted); position: relative; transition: background 0.2s; flex-shrink: 0; }
@@ -65,64 +113,15 @@
   .toggle-label { font-size: 0.8rem; color: var(--sub); font-weight: 500; }
   .recur-select-wrap { flex: 1; }
   .recur-select-wrap select { font-size: 0.82rem; padding: 0.45rem 0.65rem; }
-
-  .sign-row { display: flex; gap: 0.5rem; align-items: flex-end; }
-  .sign-row .field { flex: 1; }
-  .sign-toggle {
-    flex-shrink: 0;
-    width: 3rem;
-    height: 2.65rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    -webkit-tap-highlight-color: transparent;
-    transition: background 0.15s, border-color 0.15s;
-    margin-bottom: 0;
-  }
-  .sign-toggle.negative { background: rgba(242,107,107,0.15); border-color: var(--negative); color: var(--negative); }
-  .sign-toggle.positive { background: rgba(62,207,142,0.15); border-color: var(--positive); color: var(--positive); }
-
-  .add-entry-toggle {
-    display: block;
-    width: calc(100% - 2rem);
-    margin: 0.75rem 1rem 0;
-    padding: 0.8rem;
-    background: var(--surface);
-    border: 1px dashed var(--muted);
-    border-radius: 12px;
-    color: var(--accent);
-    font-family: var(--sans);
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    -webkit-tap-highlight-color: transparent;
-    transition: border-color 0.15s, background 0.15s;
-  }
-  .add-entry-toggle:active { background: var(--border); }
-  .add-entry-toggle.open {
-    border-style: solid;
-    border-color: var(--accent);
-    color: var(--sub);
-  }
-
   .add-btn { width: 100%; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-family: var(--sans); font-size: 0.9rem; font-weight: 600; padding: 0.7rem; cursor: pointer; margin-top: 0.25rem; transition: opacity 0.15s, transform 0.1s; -webkit-tap-highlight-color: transparent; }
   .add-btn:active { opacity: 0.85; transform: scale(0.98); }
 
-  /* SECTION HEADER */
+  /* ── SECTION HEADER ── */
   .section-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.25rem 0.625rem; }
   .section-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); }
   .entry-count { font-size: 0.72rem; color: var(--muted); }
 
-  /* FILTER TABS */
+  /* ── FILTER TABS ── */
   .filter-bar { display: flex; gap: 0.5rem; padding: 0 1rem 0.75rem; flex-wrap: wrap; }
   .filter-btn { padding: 0.35rem 0.875rem; border-radius: 20px; border: 1px solid var(--border); background: none; color: var(--sub); font-family: var(--sans); font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
   .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -130,22 +129,20 @@
   .filter-btn.active.f-paid { background: var(--positive); border-color: var(--positive); color: #0f1117; }
   .filter-btn.active.f-pastdue { background: var(--warning); border-color: var(--warning); color: #0f1117; }
 
-  /* LEDGER */
+  /* ── LEDGER ── */
   .ledger { margin: 0 1rem; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
   .ledger-start { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 0.75rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border); gap: 0.5rem; }
   .ledger-start-label { font-size: 0.78rem; color: var(--sub); font-style: italic; }
   .ledger-start-val { font-family: var(--mono); font-size: 0.85rem; color: var(--sub); }
-
   .ledger-entry { display: grid; grid-template-columns: auto 1fr auto; align-items: start; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); gap: 0.75rem; animation: fadeIn 0.2s ease; }
   .ledger-entry:last-child { border-bottom: none; }
   .ledger-entry.is-paid { opacity: 0.45; }
   .ledger-entry.is-pastdue { border-left: 3px solid var(--warning); }
+  .ledger-entry.is-current { border-left: 3px solid var(--accent); background: rgba(91,138,240,0.04); }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; } }
-
   .entry-check { margin-top: 0.15rem; width: 1.25rem; height: 1.25rem; border-radius: 50%; border: 2px solid var(--muted); background: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
   .entry-check.checked { background: var(--positive); border-color: var(--positive); }
   .entry-check.checked::after { content: ''; display: block; width: 0.35rem; height: 0.6rem; border: 2px solid #0f1117; border-top: none; border-left: none; transform: rotate(45deg) translateY(-1px); }
-
   .entry-left { min-width: 0; }
   .entry-note { font-size: 0.88rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .is-paid .entry-note { text-decoration: line-through; color: var(--sub); }
@@ -155,7 +152,7 @@
   .entry-amount-raw.neg { color: var(--negative); }
   .pastdue-badge { background: var(--warning); color: #0f1117; font-size: 0.62rem; font-weight: 700; padding: 0.1rem 0.35rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
   .recur-badge { background: var(--muted); color: var(--sub); font-size: 0.62rem; font-weight: 600; padding: 0.1rem 0.35rem; border-radius: 4px; }
-
+  .current-badge { background: var(--accent); color: #fff; font-size: 0.62rem; font-weight: 700; padding: 0.1rem 0.35rem; border-radius: 4px; letter-spacing: 0.03em; }
   .entry-right { text-align: right; flex-shrink: 0; }
   .entry-balance { font-family: var(--mono); font-size: 0.88rem; font-weight: 600; }
   .entry-balance.pos { color: var(--positive); }
@@ -164,13 +161,12 @@
   .entry-action-btn { background: none; border: none; color: var(--muted); font-size: 0.7rem; cursor: pointer; padding: 0; font-family: var(--sans); -webkit-tap-highlight-color: transparent; }
   .entry-action-btn:active { color: var(--accent); }
   .entry-action-btn.del:active { color: var(--negative); }
-
   .empty-state { padding: 2.5rem 1rem; text-align: center; background: var(--surface); }
   .empty-icon { font-size: 2rem; margin-bottom: 0.5rem; }
   .empty-title { font-size: 0.95rem; font-weight: 600; color: var(--sub); margin-bottom: 0.25rem; }
   .empty-hint { font-size: 0.78rem; color: var(--muted); }
 
-  /* MODAL */
+  /* ── MODALS ── */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 100; align-items: center; justify-content: center; padding: 1.25rem; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; width: 100%; max-width: 360px; max-height: 90dvh; overflow-y: auto; }
@@ -179,21 +175,33 @@
   .modal-field { margin-bottom: 0.75rem; }
   .modal-field label { display: block; font-size: 0.7rem; font-weight: 500; color: var(--sub); margin-bottom: 0.3rem; letter-spacing: 0.04em; text-transform: uppercase; }
   .modal-field input, .modal-field select { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--mono); font-size: 0.95rem; padding: 0.6rem 0.75rem; outline: none; -webkit-appearance: none; }
-  .modal-field input:focus, .modal-field select:focus { border-color: var(--accent); }
-  .modal-field select option { background: var(--surface); }
+  .modal-field input:focus { border-color: var(--accent); }
   .modal-paid-row { display: flex; align-items: center; gap: 0.625rem; margin-bottom: 0.875rem; }
   .modal-paid-row .toggle-label { font-size: 0.82rem; color: var(--text); }
   .modal-btns { display: flex; gap: 0.625rem; margin-top: 1rem; }
   .modal-btns button { flex: 1; padding: 0.65rem; border-radius: 8px; border: 1px solid var(--border); font-family: var(--sans); font-size: 0.88rem; font-weight: 500; cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .modal-btns .btn-confirm { background: var(--accent); border-color: var(--accent); color: #fff; }
   .modal-btns .btn-cancel { background: none; color: var(--sub); }
-
-  /* CHOICE MODAL */
+  .modal-btns .btn-danger { background: var(--negative); border-color: var(--negative); color: #fff; }
   .choice-modal .choice-btn { display: block; width: 100%; text-align: left; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem 1rem; margin-bottom: 0.625rem; cursor: pointer; font-family: var(--sans); color: var(--text); -webkit-tap-highlight-color: transparent; transition: border-color 0.15s; }
   .choice-modal .choice-btn:active { border-color: var(--accent); }
   .choice-modal .choice-btn .choice-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.2rem; }
   .choice-modal .choice-btn .choice-desc { font-size: 0.75rem; color: var(--sub); }
   .choice-modal .btn-cancel-full { width: 100%; padding: 0.65rem; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--sub); font-family: var(--sans); font-size: 0.88rem; cursor: pointer; }
+
+  /* ── MANAGE ACCOUNTS ── */
+  .acct-list { margin-bottom: 1rem; }
+  .acct-list-item { display: flex; align-items: center; gap: 0.625rem; padding: 0.625rem 0; border-bottom: 1px solid var(--border); }
+  .acct-list-item:last-child { border-bottom: none; }
+  .acct-list-name { flex: 1; font-size: 0.9rem; font-weight: 500; }
+  .acct-list-bal { font-family: var(--mono); font-size: 0.8rem; color: var(--sub); }
+  .acct-list-edit { background: none; border: none; color: var(--accent); font-size: 0.72rem; cursor: pointer; font-family: var(--sans); padding: 0.2rem 0.4rem; }
+  .acct-list-del { background: none; border: none; color: var(--negative); font-size: 0.72rem; cursor: pointer; font-family: var(--sans); padding: 0.2rem 0.4rem; }
+  .add-acct-form { border-top: 1px solid var(--border); padding-top: 0.875rem; margin-top: 0.25rem; }
+  .add-acct-form .form-title { margin-bottom: 0.625rem; }
+  .add-acct-row { display: flex; gap: 0.5rem; align-items: flex-end; }
+  .add-acct-row .field { flex: 1; }
+  .add-acct-btn { flex-shrink: 0; padding: 0.6rem 0.875rem; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-family: var(--sans); font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -201,17 +209,13 @@
 <!-- HEADER -->
 <div class="header">
   <div class="header-top">
-    <div class="starting-wrap">
-      <div class="header-label">Starting</div>
-      <div class="starting-val" id="startingDisplay">$0.00</div>
-      <button class="edit-start-btn" onclick="openStartModal()">edit</button>
+    <div class="account-selector">
+      <select class="account-select" id="accountSelect" onchange="switchAccount()"></select>
+      <button class="manage-btn" onclick="openManageAccounts()">Manage</button>
     </div>
-    <div style="text-align:right">
-      <div style="display:flex;align-items:center;justify-content:flex-end;gap:0.4rem;">
-        <div class="header-label">Future Balance</div>
-        <button class="info-btn" onclick="openInfoModal()" title="What is Future Balance?">?</button>
-      </div>
-      <div class="balance-display" id="mainBalance">$0.00</div>
+    <div class="combined-balance">
+      <div class="combined-label">All Accounts</div>
+      <div class="combined-val" id="combinedBalance">$0.00</div>
     </div>
   </div>
 </div>
@@ -231,7 +235,23 @@
 </div>
 <input type="file" id="importInput" accept=".csv" style="display:none" onchange="importCSV(event)">
 
-<!-- ENTRY FORM -->
+<!-- ACCOUNT CURRENT BALANCE -->
+<div class="acct-balance-bar">
+  <div class="acct-balance-left">
+    <div class="acct-balance-label">Current Balance</div>
+    <div class="acct-balance-name" id="acctBalanceName"></div>
+  </div>
+  <div style="text-align:right">
+    <div class="acct-balance-val" id="acctCurrentBalance">$0.00</div>
+    <div class="acct-starting">
+      <div class="acct-starting-label">Starting</div>
+      <div class="acct-starting-val" id="startingDisplay">$0.00</div>
+      <button class="edit-start-btn" onclick="openStartModal()">edit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ENTRY TOGGLE -->
 <button class="add-entry-toggle" id="addEntryToggle" onclick="toggleForm()">＋ Add Entry</button>
 <div class="form-card" id="formCard" style="display:none">
   <div class="form-title">New Entry</div>
@@ -239,7 +259,7 @@
     <div class="sign-row">
       <div class="field">
         <label>Amount</label>
-        <input type="text" id="inputAmount" placeholder="45.00" inputmode="decimal" pattern="[0-9]*\.?[0-9]*">
+        <input type="text" id="inputAmount" placeholder="45.00" inputmode="decimal">
       </div>
       <button type="button" class="sign-toggle negative" id="signToggle" onclick="toggleSign()">−</button>
     </div>
@@ -254,7 +274,6 @@
       <input type="text" id="inputNote" placeholder="Electric bill, paycheck…" maxlength="60">
     </div>
   </div>
-  <!-- RECURRING TOGGLE -->
   <div class="recurring-row">
     <div class="toggle-wrap" onclick="toggleRecurring()">
       <div class="toggle-track" id="recurTrack"><div class="toggle-thumb"></div></div>
@@ -274,7 +293,7 @@
     </div>
   </div>
   <button class="add-btn" onclick="addEntry()">Add Entry</button>
-</div><!-- /form-card -->
+</div>
 
 <!-- LEDGER -->
 <div class="section-header">
@@ -289,28 +308,13 @@
 </div>
 <div class="ledger" id="ledger"></div>
 
-<!-- INFO MODAL -->
-<div class="modal-overlay" id="infoModal">
-  <div class="modal">
-    <h3>Future Balance</h3>
-    <p class="modal-sub" style="font-size:0.85rem;line-height:1.5;color:var(--text)">
-      This is your projected balance after all scheduled transactions — including future recurring bills and deposits — have been applied.<br><br>
-      It is <strong>not</strong> your balance today. It reflects every entry in your ledger, paid or unpaid, past or future.<br><br>
-      To see what you have right now, look at entries up to today's date in the ledger.
-    </p>
-    <div class="modal-btns">
-      <button class="btn-confirm" onclick="closeModal('infoModal')">Got it</button>
-    </div>
-  </div>
-</div>
-
 <!-- START BALANCE MODAL -->
 <div class="modal-overlay" id="startModal">
   <div class="modal">
     <h3>Starting Balance</h3>
-    <p class="modal-sub">Set the amount you're starting from.</p>
+    <p class="modal-sub">Set the opening balance for this account.</p>
     <div class="modal-field">
-      <input type="text" id="startInput" placeholder="1500.00" inputmode="decimal" pattern="-?[0-9]*\.?[0-9]*">
+      <input type="text" id="startInput" placeholder="1500.00" inputmode="decimal">
     </div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal('startModal')">Cancel</button>
@@ -327,7 +331,7 @@
     <div class="modal-field">
       <label>Amount</label>
       <div class="sign-row">
-        <input type="text" id="editAmount" inputmode="decimal" pattern="[0-9]*\.?[0-9]*" style="flex:1">
+        <input type="text" id="editAmount" inputmode="decimal" style="flex:1">
         <button type="button" class="sign-toggle negative" id="editSignToggle" onclick="toggleEditSign()">−</button>
       </div>
     </div>
@@ -404,29 +408,103 @@
   </div>
 </div>
 
+<!-- MANAGE ACCOUNTS MODAL -->
+<div class="modal-overlay" id="manageModal">
+  <div class="modal">
+    <h3>Manage Accounts</h3>
+    <div class="acct-list" id="acctList"></div>
+    <div class="add-acct-form">
+      <div class="form-title">Add Account</div>
+      <div class="add-acct-row">
+        <div class="field">
+          <label>Name</label>
+          <input type="text" id="newAcctName" placeholder="Checking, Savings…" maxlength="30">
+        </div>
+        <button class="add-acct-btn" onclick="addAccount()">Add</button>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-confirm" onclick="closeModal('manageModal')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- RENAME ACCOUNT MODAL -->
+<div class="modal-overlay" id="renameModal">
+  <div class="modal">
+    <h3>Rename Account</h3>
+    <div class="modal-field">
+      <label>Name</label>
+      <input type="text" id="renameInput" maxlength="30">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('renameModal')">Cancel</button>
+      <button class="btn-confirm" onclick="saveRename()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE ACCOUNT MODAL -->
+<div class="modal-overlay" id="deleteAcctModal">
+  <div class="modal">
+    <h3>Delete Account</h3>
+    <p class="modal-sub" style="font-size:0.85rem;line-height:1.5;color:var(--text)" id="deleteAcctMsg"></p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('deleteAcctModal')">Cancel</button>
+      <button class="btn-danger" onclick="confirmDeleteAccount()">Delete</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const STORAGE_KEY = 'billtracker_v2';
-let state = { starting: 0, entries: [] };
+const STORAGE_KEY = 'billtracker_v3';
+
+// State: accounts array + entries array
+// account: { id, name, starting }
+// entry:   { id, accountId, amount, date, note, paid, seriesId, interval }
+let state = { accounts: [], entries: [] };
+let activeAccountId = null;
 let activeFilter = 'all';
 let recurringOn = false;
-let pendingEdit = null; // { id, amount, date, note, paid }
+let formSign = -1;
+let editSign = -1;
+let editingId = null;
+let editPaidVal = false;
+let pendingEdit = null;
+let pendingDelete = null;
+let renamingAcctId = null;
+let deletingAcctId = null;
 
 // ── INIT ──
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) state = JSON.parse(raw);
+    // migrate old single-account data
+    if (!state.accounts) state.accounts = [];
+    if (!state.entries)  state.entries  = [];
     state.entries.forEach(e => {
       if (e.paid === undefined) e.paid = false;
-      if (!e.seriesId) e.seriesId = null;  // treat empty string as null
+      if (!e.seriesId) e.seriesId = null;
       if (!e.interval) e.interval = null;
+      if (!e.accountId) e.accountId = state.accounts[0]?.id || null;
     });
-  } catch(e) {}
+  } catch(err) {}
+
+  // Ensure at least one account
+  if (state.accounts.length === 0) {
+    state.accounts.push({ id: uid(), name: 'Main Account', starting: 0 });
+    save();
+  }
+  activeAccountId = state.accounts[0].id;
   document.getElementById('inputDate').value = todayISO();
+  rebuildAccountSelect();
 }
+
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
 // ── UTILS ──
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
 function todayISO() { return new Date().toISOString().slice(0,10); }
 function fmt(n) {
   const abs = Math.abs(n).toFixed(2);
@@ -437,21 +515,13 @@ function formatDate(iso) {
   const [y,m,d] = iso.split('-');
   return `${m}/${d}/${y.slice(2)}`;
 }
-function isPastDue(e) {
-  if (e.paid || !e.date) return false;
-  return e.date < todayISO();
-}
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+function isPastDue(e) { return !e.paid && e.date && e.date < todayISO(); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// ── RECURRING DATES ──
 function addMonths(isoDate, n) {
   const d = new Date(isoDate + 'T00:00:00');
   const day = d.getDate();
   d.setMonth(d.getMonth() + n);
-  // clamp to last day of month
   const lastDay = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
   d.setDate(Math.min(day, lastDay));
   return d.toISOString().slice(0,10);
@@ -476,12 +546,119 @@ function generateRecurringDates(startDate, interval, endDate) {
   return dates;
 }
 
-// ── RECURRING TOGGLE (form) ──
-function toggleRecurring() {
-  recurringOn = !recurringOn;
-  document.getElementById('recurTrack').classList.toggle('on', recurringOn);
-  document.getElementById('recurSelectWrap').style.display = recurringOn ? 'block' : 'none';
-  document.getElementById('recurEndWrap').style.display = recurringOn ? 'grid' : 'none';
+// ── ACCOUNTS ──
+function currentAccount() { return state.accounts.find(a => a.id === activeAccountId); }
+
+function rebuildAccountSelect() {
+  const sel = document.getElementById('accountSelect');
+  sel.innerHTML = state.accounts.map(a =>
+    `<option value="${a.id}"${a.id === activeAccountId ? ' selected' : ''}>${escHtml(a.name)}</option>`
+  ).join('');
+}
+
+function switchAccount() {
+  activeAccountId = document.getElementById('accountSelect').value;
+  activeFilter = 'all';
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.classList.contains('f-all'));
+  });
+  render();
+}
+
+function openManageAccounts() {
+  renderAcctList();
+  document.getElementById('newAcctName').value = '';
+  document.getElementById('manageModal').classList.add('open');
+}
+
+function renderAcctList() {
+  const el = document.getElementById('acctList');
+  if (state.accounts.length === 0) { el.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;padding:0.5rem 0">No accounts yet</div>'; return; }
+  el.innerHTML = state.accounts.map(a => {
+    const entries = state.entries.filter(e => e.accountId === a.id);
+    const bal = entries.reduce((sum, e) => sum + e.amount, a.starting);
+    return `<div class="acct-list-item">
+      <div class="acct-list-name">${escHtml(a.name)}</div>
+      <div class="acct-list-bal">${fmt(bal)}</div>
+      <button class="acct-list-edit" onclick="openRename('${a.id}')">rename</button>
+      ${state.accounts.length > 1 ? `<button class="acct-list-del" onclick="openDeleteAcct('${a.id}')">delete</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function addAccount() {
+  const name = document.getElementById('newAcctName').value.trim();
+  if (!name) { document.getElementById('newAcctName').style.borderColor = 'var(--negative)'; setTimeout(() => document.getElementById('newAcctName').style.borderColor = '', 800); return; }
+  state.accounts.push({ id: uid(), name, starting: 0 });
+  save();
+  rebuildAccountSelect();
+  renderAcctList();
+  document.getElementById('newAcctName').value = '';
+  render();
+}
+
+function openRename(id) {
+  renamingAcctId = id;
+  const acct = state.accounts.find(a => a.id === id);
+  document.getElementById('renameInput').value = acct.name;
+  document.getElementById('renameModal').classList.add('open');
+  setTimeout(() => document.getElementById('renameInput').focus(), 100);
+}
+function saveRename() {
+  const name = document.getElementById('renameInput').value.trim();
+  if (!name) return;
+  const acct = state.accounts.find(a => a.id === renamingAcctId);
+  if (acct) { acct.name = name; save(); rebuildAccountSelect(); renderAcctList(); render(); }
+  closeModal('renameModal');
+}
+
+function openDeleteAcct(id) {
+  deletingAcctId = id;
+  const acct = state.accounts.find(a => a.id === id);
+  const count = state.entries.filter(e => e.accountId === id).length;
+  document.getElementById('deleteAcctMsg').textContent =
+    `You are about to delete "${acct.name}" and its ${count} transaction${count !== 1 ? 's' : ''}. This cannot be undone.`;
+  document.getElementById('deleteAcctModal').classList.add('open');
+}
+function confirmDeleteAccount() {
+  state.accounts = state.accounts.filter(a => a.id !== deletingAcctId);
+  state.entries  = state.entries.filter(e => e.accountId !== deletingAcctId);
+  if (activeAccountId === deletingAcctId) activeAccountId = state.accounts[0]?.id || null;
+  deletingAcctId = null;
+  save();
+  rebuildAccountSelect();
+  renderAcctList();
+  closeModal('deleteAcctModal');
+  render();
+}
+
+// ── CURRENT BALANCE (last paid entry, else starting) ──
+function getCurrentBalance(accountId) {
+  const acct = state.accounts.find(a => a.id === accountId);
+  if (!acct) return 0;
+  const entries = state.entries
+    .filter(e => e.accountId === accountId)
+    .sort((a,b) => { const da=a.date||'0'; const db=b.date||'0'; return da<db?-1:da>db?1:0; });
+  const paidEntries = entries.filter(e => e.paid);
+  if (paidEntries.length === 0) return acct.starting;
+  let bal = acct.starting;
+  for (const e of entries) {
+    bal += e.amount;
+    if (e === paidEntries[paidEntries.length - 1]) break;
+  }
+  return bal;
+}
+
+// ── CURRENT BALANCE ENTRY ID (for highlighting) ──
+function getCurrentEntryId(accountId) {
+  const acct = state.accounts.find(a => a.id === accountId);
+  if (!acct) return null;
+  const entries = state.entries
+    .filter(e => e.accountId === accountId)
+    .sort((a,b) => { const da=a.date||'0'; const db=b.date||'0'; return da<db?-1:da>db?1:0; });
+  const paidEntries = entries.filter(e => e.paid);
+  if (paidEntries.length === 0) return null;
+  return paidEntries[paidEntries.length - 1].id;
 }
 
 // ── FORM TOGGLE ──
@@ -492,52 +669,36 @@ function toggleForm() {
   card.style.display = isOpen ? 'none' : 'block';
   btn.textContent = isOpen ? '＋ Add Entry' : '✕ Cancel';
   btn.classList.toggle('open', !isOpen);
-  if (!isOpen) {
-    setTimeout(() => document.getElementById('inputAmount').focus(), 100);
-  }
+  if (!isOpen) setTimeout(() => document.getElementById('inputAmount').focus(), 100);
 }
 function closeForm() {
   document.getElementById('formCard').style.display = 'none';
-  const btn = document.getElementById('addEntryToggle');
-  btn.textContent = '＋ Add Entry';
-  btn.classList.remove('open');
+  document.getElementById('addEntryToggle').textContent = '＋ Add Entry';
+  document.getElementById('addEntryToggle').classList.remove('open');
 }
 
 // ── SIGN TOGGLES ──
-let formSign = -1; // -1 = negative, 1 = positive
 function toggleSign() {
-  formSign = formSign * -1;
+  formSign *= -1;
   const btn = document.getElementById('signToggle');
-  if (formSign === -1) {
-    btn.textContent = '−';
-    btn.className = 'sign-toggle negative';
-  } else {
-    btn.textContent = '+';
-    btn.className = 'sign-toggle positive';
-  }
+  btn.textContent = formSign === -1 ? '−' : '+';
+  btn.className = 'sign-toggle ' + (formSign === -1 ? 'negative' : 'positive');
 }
-function getFormAmount() {
-  const raw = parseFloat(document.getElementById('inputAmount').value);
-  if (isNaN(raw)) return NaN;
-  return Math.abs(raw) * formSign;
-}
-
-let editSign = -1;
+function getFormAmount() { const r = parseFloat(document.getElementById('inputAmount').value); return isNaN(r) ? NaN : Math.abs(r) * formSign; }
 function toggleEditSign() {
-  editSign = editSign * -1;
+  editSign *= -1;
   const btn = document.getElementById('editSignToggle');
-  if (editSign === -1) {
-    btn.textContent = '−';
-    btn.className = 'sign-toggle negative';
-  } else {
-    btn.textContent = '+';
-    btn.className = 'sign-toggle positive';
-  }
+  btn.textContent = editSign === -1 ? '−' : '+';
+  btn.className = 'sign-toggle ' + (editSign === -1 ? 'negative' : 'positive');
 }
-function getEditAmount() {
-  const raw = parseFloat(document.getElementById('editAmount').value);
-  if (isNaN(raw)) return NaN;
-  return Math.abs(raw) * editSign;
+function getEditAmount() { const r = parseFloat(document.getElementById('editAmount').value); return isNaN(r) ? NaN : Math.abs(r) * editSign; }
+
+// ── RECURRING TOGGLE ──
+function toggleRecurring() {
+  recurringOn = !recurringOn;
+  document.getElementById('recurTrack').classList.toggle('on', recurringOn);
+  document.getElementById('recurSelectWrap').style.display = recurringOn ? 'block' : 'none';
+  document.getElementById('recurEndWrap').style.display = recurringOn ? 'grid' : 'none';
 }
 
 // ── ADD ENTRY ──
@@ -554,19 +715,21 @@ function addEntry() {
     const endDate  = document.getElementById('recurEndDate').value || null;
     const seriesId = uid();
     const dates = generateRecurringDates(date, interval, endDate);
-    dates.forEach(d => {
-      state.entries.push({ id: uid(), amount, date: d, note, paid: false, seriesId, interval });
-    });
+    dates.forEach(d => state.entries.push({ id: uid(), accountId: activeAccountId, amount, date: d, note, paid: false, seriesId, interval }));
     showToast(`Added ${dates.length} recurring entries`);
   } else {
-    state.entries.push({ id: uid(), amount, date, note, paid: false, seriesId: null, interval: null });
+    state.entries.push({ id: uid(), accountId: activeAccountId, amount, date, note, paid: false, seriesId: null, interval: null });
   }
 
   save(); render();
   document.getElementById('inputAmount').value = '';
   document.getElementById('inputNote').value = '';
   document.getElementById('inputDate').value = todayISO();
-  document.getElementById('inputAmount').focus();
+  document.getElementById('recurEndDate').value = '';
+  formSign = -1;
+  const sb = document.getElementById('signToggle');
+  sb.textContent = '−'; sb.className = 'sign-toggle negative';
+  closeForm();
 }
 
 // ── TOGGLE PAID ──
@@ -579,37 +742,20 @@ function togglePaid(id) {
 function deleteEntry(id) {
   const e = state.entries.find(x => x.id === id);
   if (!e) return;
-  if (e.seriesId) {
-    // ask
-    pendingEdit = { deleteId: id, seriesId: e.seriesId, date: e.date };
-    openDeleteChoiceModal(id);
-  } else {
-    state.entries = state.entries.filter(x => x.id !== id);
-    save(); render();
-  }
-}
-let pendingDelete = null;
-function openDeleteChoiceModal(id) {
-  pendingDelete = id;
-  document.getElementById('deleteChoiceModal').classList.add('open');
+  if (e.seriesId) { pendingDelete = id; document.getElementById('deleteChoiceModal').classList.add('open'); }
+  else { state.entries = state.entries.filter(x => x.id !== id); save(); render(); }
 }
 function applyDeleteChoice(scope) {
-  const id = pendingDelete;
-  if (!id) { closeModal('recurChoiceModal'); return; }
-  const e  = state.entries.find(x => x.id === id);
-  if (!e) { closeModal('recurChoiceModal'); return; }
-  const seriesId = e.seriesId;
-  const date     = e.date;
+  if (!pendingDelete) { closeModal('deleteChoiceModal'); return; }
+  const e = state.entries.find(x => x.id === pendingDelete);
+  if (!e) { closeModal('deleteChoiceModal'); return; }
   if (scope === 'one') {
-    state.entries = state.entries.filter(x => x.id !== id);
+    state.entries = state.entries.filter(x => x.id !== pendingDelete);
   } else {
-    // remove this entry + all unpaid entries in same series on or after this date
     state.entries = state.entries.filter(x => {
-      if (x.seriesId !== seriesId) return true; // different series, keep
-      if (x.paid) return true;                  // already paid, keep
-      if (x.date > date) return false;          // future unpaid in series, remove
-      if (x.date === date) return false;        // same date (including this one), remove
-      return true;                              // before this date, keep
+      if (x.seriesId !== e.seriesId) return true;
+      if (x.paid) return true;
+      return x.date < e.date;
     });
   }
   pendingDelete = null;
@@ -618,30 +764,24 @@ function applyDeleteChoice(scope) {
 }
 
 // ── EDIT ──
-let editingId = null;
-let editPaidVal = false;
 function openEdit(id) {
   const e = state.entries.find(x => x.id === id);
   if (!e) return;
   editingId = id;
   editPaidVal = e.paid;
-
-  const absAmt = Math.abs(e.amount);
   editSign = e.amount >= 0 ? 1 : -1;
-  document.getElementById('editAmount').value = absAmt;
+  document.getElementById('editAmount').value = Math.abs(e.amount);
   const eBtn = document.getElementById('editSignToggle');
-  if (editSign === 1) { eBtn.textContent = '+'; eBtn.className = 'sign-toggle positive'; }
-  else                { eBtn.textContent = '−'; eBtn.className = 'sign-toggle negative'; }
-  document.getElementById('editDate').value   = e.date;
-  document.getElementById('editNote').value   = e.note;
+  eBtn.textContent = editSign === 1 ? '+' : '−';
+  eBtn.className = 'sign-toggle ' + (editSign === 1 ? 'positive' : 'negative');
+  document.getElementById('editDate').value  = e.date;
+  document.getElementById('editNote').value  = e.note;
   document.getElementById('editPaidTrack').classList.toggle('on', e.paid);
   document.getElementById('editModalTitle').textContent = e.seriesId ? 'Edit Recurring Entry' : 'Edit Entry';
   document.getElementById('editModalSub').textContent   = e.seriesId ? 'Part of a recurring series' : '';
-  // Show end date field only for recurring entries
   const endDateWrap = document.getElementById('editEndDateWrap');
   if (e.seriesId) {
     endDateWrap.style.display = 'block';
-    // Find the last unpaid entry in this series to pre-fill end date
     const seriesEntries = state.entries.filter(x => x.seriesId === e.seriesId && !x.paid);
     const lastDate = seriesEntries.reduce((max, x) => x.date > max ? x.date : max, '');
     document.getElementById('editEndDate').value = lastDate || '';
@@ -660,31 +800,20 @@ function submitEdit() {
   const date   = document.getElementById('editDate').value;
   const note   = document.getElementById('editNote').value.trim();
   if (isNaN(amount)) { shake('editAmount'); return; }
-
   const editEndDate = document.getElementById('editEndDate').value || null;
   pendingEdit = { id: editingId, amount, date, note, paid: editPaidVal, editEndDate };
   const e = state.entries.find(x => x.id === editingId);
-
-  // Detect if only the end date changed vs other fields
   const origEndDate = (() => {
     if (!e || !e.seriesId) return null;
-    const seriesEntries = state.entries.filter(x => x.seriesId === e.seriesId && !x.paid);
-    return seriesEntries.reduce((max, x) => x.date > max ? x.date : max, '');
+    const s = state.entries.filter(x => x.seriesId === e.seriesId && !x.paid);
+    return s.reduce((max, x) => x.date > max ? x.date : max, '');
   })();
-  const endDateChanged  = e && e.seriesId && editEndDate !== origEndDate;
-  const otherChanged    = e && (Math.abs(e.amount) !== Math.abs(amount) ||
-                          e.note !== note || e.date !== date || e.paid !== editPaidVal);
-
+  const endDateChanged = e && e.seriesId && editEndDate !== origEndDate;
+  const otherChanged   = e && (Math.abs(e.amount) !== Math.abs(amount) || e.note !== note || e.date !== date || e.paid !== editPaidVal);
   closeModal('editModal');
-
-  if (e && e.seriesId && e.seriesId !== '') {
-    if (endDateChanged && !otherChanged) {
-      // Only end date changed — show warning and apply to whole series
-      document.getElementById('endDateConfirmModal').classList.add('open');
-    } else {
-      // Other fields changed — ask just this one or all future
-      document.getElementById('recurChoiceModal').classList.add('open');
-    }
+  if (e && e.seriesId) {
+    if (endDateChanged && !otherChanged) { document.getElementById('endDateConfirmModal').classList.add('open'); }
+    else { document.getElementById('recurChoiceModal').classList.add('open'); }
   } else {
     applyRecurChoice('one');
   }
@@ -705,36 +834,28 @@ function applyEndDateChange() {
   save(); render();
   showToast('Series end date updated');
 }
-
 function applyRecurChoice(scope) {
   if (!pendingEdit) { closeModal('recurChoiceModal'); return; }
-  const { id, amount, date, note, paid } = pendingEdit;
+  const { id, amount, date, note, paid, editEndDate } = pendingEdit;
   const orig = state.entries.find(x => x.id === id);
-
   if (scope === 'one') {
     if (orig) { orig.amount = amount; orig.date = date; orig.note = note; orig.paid = paid; }
   } else {
-    const { editEndDate } = pendingEdit;
-    // update this + all future unpaid in same series
-    // if end date set, remove entries beyond it
     if (editEndDate) {
       state.entries = state.entries.filter(e => {
         if (e.seriesId !== orig.seriesId) return true;
         if (e.paid) return true;
-        if (e.date <= editEndDate) return true;
-        return false; // remove unpaid entries beyond new end date
+        return e.date <= editEndDate;
       });
     }
     state.entries.forEach(e => {
       if (e.seriesId !== orig.seriesId) return;
       if (e.paid && e.id !== id) return;
       if (e.date < orig.date) return;
-      e.amount = amount;
-      e.note   = note;
+      e.amount = amount; e.note = note;
       if (e.id === id) { e.date = date; e.paid = paid; }
     });
   }
-
   pendingEdit = null;
   closeModal('recurChoiceModal');
   save(); render();
@@ -743,54 +864,52 @@ function applyRecurChoice(scope) {
 // ── FILTER ──
 function setFilter(f) {
   activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.classList.contains('f-' + f));
-  });
+  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.classList.contains('f-' + f)));
   render();
 }
 
 // ── RENDER ──
 function render() {
-  document.getElementById('startingDisplay').textContent = fmt(state.starting);
+  const acct = currentAccount();
+  if (!acct) return;
 
-  // Calc running balances (oldest→newest for math, stable tiebreak by id)
-  const chronological = [...state.entries].sort((a,b) => {
-    if (!a.date && !b.date) return a.id < b.id ? -1 : 1;
-    if (!a.date) return 1;
-    if (!b.date) return -1;
-    const cmp = a.date.localeCompare(b.date);
-    return cmp !== 0 ? cmp : (a.id < b.id ? -1 : 1);
-  });
+  // Combined balance across all accounts
+  let combinedBal = 0;
+  state.accounts.forEach(a => { combinedBal += getCurrentBalance(a.id); });
+  const combEl = document.getElementById('combinedBalance');
+  combEl.textContent = fmt(combinedBal);
+  combEl.className = 'combined-val ' + (combinedBal >= 0 ? 'pos' : 'neg');
+
+  // Current account balance
+  const currentBal = getCurrentBalance(activeAccountId);
+  const currentEntryId = getCurrentEntryId(activeAccountId);
+  document.getElementById('acctCurrentBalance').textContent = fmt(currentBal);
+  document.getElementById('acctCurrentBalance').className = 'acct-balance-val ' + (currentBal >= 0 ? 'pos' : 'neg');
+  document.getElementById('acctBalanceName').textContent = acct.name;
+  document.getElementById('startingDisplay').textContent = fmt(acct.starting);
+
+  // Build balance map for this account (oldest→newest)
+  const acctEntries = state.entries.filter(e => e.accountId === activeAccountId);
+  const chronological = [...acctEntries].sort((a,b) => { const da=a.date||'0'; const db=b.date||'0'; return da<db?-1:da>db?1:0; });
   const balanceMap = {};
-  let running = state.starting;
+  let running = acct.starting;
   chronological.forEach(e => { running += e.amount; balanceMap[e.id] = running; });
 
-  const mainEl = document.getElementById('mainBalance');
-  mainEl.textContent = fmt(running);
-  mainEl.className   = 'balance-display ' + (running >= 0 ? 'pos' : 'neg');
-
-  const pastDueCount  = state.entries.filter(e => isPastDue(e)).length;
-  const unpaidCount   = state.entries.filter(e => !e.paid).length;
-  document.getElementById('entryCount').textContent = state.entries.length
-    ? `${state.entries.length} entries · ${unpaidCount} unpaid${pastDueCount ? ' · ' + pastDueCount + ' past due' : ''}`
+  // Entry counts
+  const pastDueCount = acctEntries.filter(e => isPastDue(e)).length;
+  const unpaidCount  = acctEntries.filter(e => !e.paid).length;
+  document.getElementById('entryCount').textContent = acctEntries.length
+    ? `${acctEntries.length} entries · ${unpaidCount} unpaid${pastDueCount ? ' · ' + pastDueCount + ' past due' : ''}`
     : '';
 
-  // Display order: oldest date first (ascending) so soonest due is at top
-  let displayed = [...state.entries].sort((a,b) => {
-    const da = a.date || '9999-99-99';
-    const db = b.date || '9999-99-99';
-    if (da > db) return 1;
-    if (da < db) return -1;
-    return 0;
-  });
-
+  // Display sort: oldest first
+  let displayed = [...acctEntries].sort((a,b) => { const da=a.date||'0'; const db=b.date||'0'; return da<db?-1:da>db?1:0; });
   if (activeFilter === 'unpaid')  displayed = displayed.filter(e => !e.paid);
   if (activeFilter === 'paid')    displayed = displayed.filter(e => e.paid);
   if (activeFilter === 'pastdue') displayed = displayed.filter(e => isPastDue(e));
 
   const ledger = document.getElementById('ledger');
-
-  if (state.entries.length === 0) {
+  if (acctEntries.length === 0) {
     ledger.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No entries yet</div><div class="empty-hint">Load a saved CSV or add your first entry above</div></div>`;
     return;
   }
@@ -801,28 +920,28 @@ function render() {
 
   let html = '';
   if (activeFilter === 'all') {
-    html += `<div class="ledger-start"><span class="ledger-start-label">Starting balance</span><span class="ledger-start-val">${fmt(state.starting)}</span></div>`;
+    html += `<div class="ledger-start"><span class="ledger-start-label">Starting balance</span><span class="ledger-start-val">${fmt(acct.starting)}</span></div>`;
   }
 
   displayed.forEach(e => {
-    const bal      = balanceMap[e.id];
+    const bal = balanceMap[e.id];
     const balClass = bal >= 0 ? 'pos' : 'neg';
     const amtClass = e.amount >= 0 ? 'pos' : 'neg';
     const pastDue  = isPastDue(e);
-    const entryClass = [e.paid ? 'is-paid' : '', pastDue ? 'is-pastdue' : ''].filter(Boolean).join(' ');
-    const checkClass = e.paid ? 'checked' : '';
-    const recurBadge = e.seriesId ? `<span class="recur-badge">${e.interval === 'monthly' ? 'monthly' : 'bi-weekly'}</span>` : '';
-    const pastBadge  = pastDue ? `<span class="pastdue-badge">Past Due</span>` : '';
-
+    const isCurrent = e.id === currentEntryId;
+    const entryClass = [e.paid ? 'is-paid' : '', pastDue ? 'is-pastdue' : '', isCurrent ? 'is-current' : ''].filter(Boolean).join(' ');
+    const recurBadge   = e.seriesId ? `<span class="recur-badge">${e.interval === 'monthly' ? 'monthly' : 'bi-weekly'}</span>` : '';
+    const pastBadge    = pastDue  ? `<span class="pastdue-badge">Past Due</span>` : '';
+    const currentBadge = isCurrent ? `<span class="current-badge">Current</span>` : '';
     html += `
-    <div class="ledger-entry ${entryClass}" id="entry-${e.id}">
-      <div class="entry-check ${checkClass}" onclick="togglePaid('${e.id}')"></div>
+    <div class="ledger-entry ${entryClass}">
+      <div class="entry-check ${e.paid ? 'checked' : ''}" onclick="togglePaid('${e.id}')"></div>
       <div class="entry-left">
         <div class="entry-note">${escHtml(e.note || '—')}</div>
         <div class="entry-meta">
           <span class="entry-date">${formatDate(e.date)}</span>
           <span class="entry-amount-raw ${amtClass}">${fmt(e.amount)}</span>
-          ${recurBadge}${pastBadge}
+          ${recurBadge}${pastBadge}${currentBadge}
         </div>
       </div>
       <div class="entry-right">
@@ -834,23 +953,19 @@ function render() {
       </div>
     </div>`;
   });
-
   ledger.innerHTML = html;
 }
 
 // ── STARTING BALANCE ──
-function openInfoModal() {
-  document.getElementById('infoModal').classList.add('open');
-}
-
 function openStartModal() {
-  document.getElementById('startInput').value = state.starting || '';
+  const acct = currentAccount();
+  document.getElementById('startInput').value = acct ? acct.starting : '';
   document.getElementById('startModal').classList.add('open');
   setTimeout(() => document.getElementById('startInput').focus(), 100);
 }
 function saveStarting() {
   const v = parseFloat(document.getElementById('startInput').value);
-  if (!isNaN(v)) { state.starting = v; save(); render(); }
+  if (!isNaN(v)) { const acct = currentAccount(); if (acct) { acct.starting = v; save(); render(); } }
   closeModal('startModal');
 }
 
@@ -860,20 +975,21 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
   el.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
 });
 
-// ── EXPORT ──
+// ── EXPORT CSV ──
 function exportCSV() {
-  const chronological = [...state.entries].sort((a,b) => {
-    if (!a.date && !b.date) return 0;
-    if (!a.date) return 1;
-    if (!b.date) return -1;
-    return a.date.localeCompare(b.date);
-  });
-  let rows = [['BILLTRACKER_STARTING', state.starting.toFixed(2), '', '', '', '', '']];
-  rows.push(['Date','Note','Amount','Paid','SeriesId','Interval','Running Balance']);
-  let bal = state.starting;
-  chronological.forEach(e => {
-    bal += e.amount;
-    rows.push([e.date, e.note, e.amount.toFixed(2), e.paid ? 'yes' : 'no', e.seriesId||'', e.interval||'', bal.toFixed(2)]);
+  const allSorted = [...state.entries].sort((a,b) => { const da=a.date||'0'; const db=b.date||'0'; return da<db?-1:da>db?1:0; });
+  let rows = [];
+  // Write account definitions
+  state.accounts.forEach(a => rows.push(['BILLTRACKER_ACCOUNT', a.id, a.name, a.starting.toFixed(2), '', '', '', '', '']));
+  rows.push(['Date','Note','Amount','Paid','SeriesId','Interval','AccountId','AccountName','Running Balance']);
+  // Per-account running balances
+  const balTrackers = {};
+  state.accounts.forEach(a => { balTrackers[a.id] = a.starting; });
+  allSorted.forEach(e => {
+    if (balTrackers[e.accountId] === undefined) return;
+    balTrackers[e.accountId] += e.amount;
+    const acct = state.accounts.find(a => a.id === e.accountId);
+    rows.push([e.date, e.note, e.amount.toFixed(2), e.paid?'yes':'no', e.seriesId||'', e.interval||'', e.accountId, acct?.name||'', balTrackers[e.accountId].toFixed(2)]);
   });
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv'});
@@ -884,7 +1000,7 @@ function exportCSV() {
   showToast('bills.csv saved');
 }
 
-// ── IMPORT ──
+// ── IMPORT CSV ──
 function importCSV(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -892,40 +1008,47 @@ function importCSV(event) {
   reader.onload = function(e) {
     try {
       const lines = e.target.result.split('\n').map(l => l.trim()).filter(l => l);
-      let newStarting = 0, newEntries = [];
+      const newAccounts = [];
+      const newEntries  = [];
       lines.forEach(line => {
         const cols = parseCSVLine(line);
         if (!cols.length) return;
-        if (cols[0] === 'BILLTRACKER_STARTING') { newStarting = parseFloat(cols[1]) || 0; return; }
+        if (cols[0] === 'BILLTRACKER_ACCOUNT') {
+          newAccounts.push({ id: cols[1], name: cols[2], starting: parseFloat(cols[3])||0 });
+          return;
+        }
         if (cols[0] === 'Date') return;
         const amount = parseFloat(cols[2]);
         if (isNaN(amount)) return;
         newEntries.push({
-          id:       uid(),
-          date:     cols[0] || '',
-          note:     cols[1] || '',
-          amount,
-          paid:     (cols[3]||'').toLowerCase() === 'yes',
-          seriesId: cols[4] && cols[4].trim() ? cols[4].trim() : null,
-          interval: cols[5] && cols[5].trim() ? cols[5].trim() : null
+          id: uid(), date: cols[0]||'', note: cols[1]||'', amount,
+          paid: (cols[3]||'').toLowerCase()==='yes',
+          seriesId: cols[4]&&cols[4].trim() ? cols[4].trim() : null,
+          interval:  cols[5]&&cols[5].trim() ? cols[5].trim() : null,
+          accountId: cols[6]&&cols[6].trim() ? cols[6].trim() : null
         });
       });
-      state.starting = newStarting;
+      if (newAccounts.length === 0) newAccounts.push({ id: uid(), name: 'Main Account', starting: 0 });
+      // Assign orphaned entries to first account
+      newEntries.forEach(e => { if (!e.accountId || !newAccounts.find(a => a.id === e.accountId)) e.accountId = newAccounts[0].id; });
+      state.accounts = newAccounts;
       state.entries  = newEntries;
-      save(); render();
-      showToast('Loaded ' + newEntries.length + ' entries');
+      activeAccountId = newAccounts[0].id;
+      save();
+      rebuildAccountSelect();
+      render();
+      showToast(`Loaded ${newEntries.length} entries across ${newAccounts.length} account${newAccounts.length!==1?'s':''}`);
     } catch(err) { showToast('Could not read that file', true); }
     event.target.value = '';
   };
   reader.readAsText(file);
 }
 function parseCSVLine(line) {
-  const result = []; let cur = '', inQuote = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      if (inQuote && line[i+1] === '"') { cur += '"'; i++; } else inQuote = !inQuote;
-    } else if (ch === ',' && !inQuote) { result.push(cur); cur = ''; } else cur += ch;
+  const result=[]; let cur='', inQuote=false;
+  for (let i=0;i<line.length;i++) {
+    const ch=line[i];
+    if (ch==='"') { if (inQuote&&line[i+1]==='"') { cur+='"'; i++; } else inQuote=!inQuote; }
+    else if (ch===','&&!inQuote) { result.push(cur); cur=''; } else cur+=ch;
   }
   result.push(cur); return result;
 }
@@ -935,7 +1058,7 @@ function showToast(msg, isError) {
   const t = document.createElement('div');
   t.textContent = msg;
   t.style.cssText = `position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
-    background:${isError ? 'var(--negative)' : 'var(--positive)'};color:${isError ? '#fff' : '#0f1117'};
+    background:${isError?'var(--negative)':'var(--positive)'};color:${isError?'#fff':'#0f1117'};
     padding:0.6rem 1.2rem;border-radius:8px;font-size:0.85rem;font-weight:600;
     font-family:var(--sans);z-index:999;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.4);`;
   document.body.appendChild(t);
@@ -947,17 +1070,18 @@ function shake(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.style.borderColor = 'var(--negative)';
-  el.animate([{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(-3px)'},{transform:'translateX(0)'}], {duration:250});
-  setTimeout(() => el.style.borderColor = '', 800);
+  el.animate([{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(-3px)'},{transform:'translateX(0)'}],{duration:250});
+  setTimeout(() => el.style.borderColor='', 800);
 }
 
 // ── ENTER KEY ──
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
-  const activeId = document.activeElement?.id;
+  const id = document.activeElement?.id;
   if (document.getElementById('startModal').classList.contains('open')) { saveStarting(); return; }
   if (document.getElementById('editModal').classList.contains('open')) { submitEdit(); return; }
-  if (['inputAmount','inputDate','inputNote'].includes(activeId)) addEntry();
+  if (document.getElementById('renameModal').classList.contains('open')) { saveRename(); return; }
+  if (['inputAmount','inputDate','inputNote'].includes(id)) addEntry();
 });
 
 load();
