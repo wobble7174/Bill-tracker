@@ -487,6 +487,9 @@ function load() {
       if (!e.seriesId) e.seriesId = null;
       if (!e.interval) e.interval = null;
       if (!e.accountId) e.accountId = state.accounts[0]?.id || null;
+      // migrate: paid entries without a clearedDate get their due date as cleared date
+      if (e.paid && !e.clearedDate) e.clearedDate = e.date || todayISO();
+      if (!e.paid) e.clearedDate = null;
     });
   } catch(err) {}
 
@@ -651,29 +654,20 @@ function confirmDeleteAccount() {
 function getCurrentBalance(accountId) {
   const acct = state.accounts.find(a => a.id === accountId);
   if (!acct) return 0;
-  const entries = state.entries
-    .filter(e => e.accountId === accountId)
-    .sort((a,b) => { const da=a.date||'0'; const db=b.date||'0'; return da<db?-1:da>db?1:0; });
-  const paidEntries = entries.filter(e => e.paid);
-  if (paidEntries.length === 0) return acct.starting;
-  let bal = acct.starting;
-  for (const e of entries) {
-    bal += e.amount;
-    if (e === paidEntries[paidEntries.length - 1]) break;
-  }
-  return bal;
+  const paid = state.entries
+    .filter(e => e.accountId === accountId && e.paid)
+    .sort((a,b) => (a.clearedDate||a.date||'0') < (b.clearedDate||b.date||'0') ? -1 : 1);
+  if (paid.length === 0) return acct.starting;
+  return paid.reduce((sum, e) => sum + e.amount, acct.starting);
 }
 
 // ── CURRENT BALANCE ENTRY ID (for highlighting) ──
 function getCurrentEntryId(accountId) {
-  const acct = state.accounts.find(a => a.id === accountId);
-  if (!acct) return null;
-  const entries = state.entries
-    .filter(e => e.accountId === accountId)
-    .sort((a,b) => { const da=a.date||'0'; const db=b.date||'0'; return da<db?-1:da>db?1:0; });
-  const paidEntries = entries.filter(e => e.paid);
-  if (paidEntries.length === 0) return null;
-  return paidEntries[paidEntries.length - 1].id;
+  const paid = state.entries
+    .filter(e => e.accountId === accountId && e.paid)
+    .sort((a,b) => (a.clearedDate||a.date||'0') < (b.clearedDate||b.date||'0') ? -1 : 1);
+  if (paid.length === 0) return null;
+  return paid[paid.length - 1].id;
 }
 
 // ── FORM TOGGLE ──
@@ -750,7 +744,11 @@ function addEntry() {
 // ── TOGGLE PAID ──
 function togglePaid(id) {
   const e = state.entries.find(x => x.id === id);
-  if (e) { e.paid = !e.paid; save(); render(); }
+  if (e) {
+    e.paid = !e.paid;
+    e.clearedDate = e.paid ? todayISO() : null;
+    save(); render();
+  }
 }
 
 // ── DELETE ──
@@ -854,7 +852,15 @@ function applyRecurChoice(scope) {
   const { id, amount, date, note, paid, editEndDate } = pendingEdit;
   const orig = state.entries.find(x => x.id === id);
   if (scope === 'one') {
-    if (orig) { orig.amount = amount; orig.date = date; orig.note = note; orig.paid = paid; }
+    if (orig) {
+      orig.amount = amount; orig.date = date; orig.note = note;
+      if (paid !== orig.paid) {
+        orig.paid = paid;
+        orig.clearedDate = paid ? todayISO() : null;
+      } else {
+        orig.paid = paid;
+      }
+    }
   } else {
     if (editEndDate) {
       state.entries = state.entries.filter(e => {
@@ -908,32 +914,18 @@ function render() {
   const acctEntries = state.entries.filter(e => e.accountId === activeAccountId);
   const chronological = [...acctEntries].sort((a,b) => { const da=a.date||'0'; const db=b.date||'0'; return da<db?-1:da>db?1:0; });
 
-  // Cleared balance map — running total of paid entries only
-  // Each entry stores what the cleared balance is AT that point in time
-  // For unpaid entries, cleared balance stays the same as previous paid entry
-  const clearedBalanceMap = {};
-  let clearedRunning = acct.starting;
-  chronological.forEach(e => {
-    if (e.paid) clearedRunning += e.amount;
-    clearedBalanceMap[e.id] = clearedRunning; // same value repeats for unpaid rows
-  });
+  // Sort paid entries by cleared date, unpaid by due date
+  // Paid entries come first (they've actually cleared), unpaid after
+  const paidEntries   = acctEntries.filter(e => e.paid)
+    .sort((a,b) => (a.clearedDate||a.date||'0') < (b.clearedDate||b.date||'0') ? -1 : 1);
+  const unpaidEntries = acctEntries.filter(e => !e.paid)
+    .sort((a,b) => (a.date||'0') < (b.date||'0') ? -1 : 1);
 
-  // Projected balance: for each unpaid entry, show the last cleared
-  // balance plus all unpaid amounts up to and including this entry.
-  // This shows real impact of paying each bill in sequence.
-  const projectedBalanceMap = {};
-  let lastCleared = acct.starting;
-  let unpaidAccum = 0;
-  chronological.forEach(e => {
-    if (e.paid) {
-      lastCleared += e.amount;
-      unpaidAccum = 0; // reset unpaid accumulator when a paid entry is encountered
-      projectedBalanceMap[e.id] = lastCleared;
-    } else {
-      unpaidAccum += e.amount;
-      projectedBalanceMap[e.id] = lastCleared + unpaidAccum;
-    }
-  });
+  // Calculate running total: paid entries in cleared order first, then unpaid in due date order
+  const balanceMap = {};
+  let running = acct.starting;
+  paidEntries.forEach(e => { running += e.amount; balanceMap[e.id] = running; });
+  unpaidEntries.forEach(e => { running += e.amount; balanceMap[e.id] = running; });
 
   // Entry counts
   const pastDueCount = acctEntries.filter(e => isPastDue(e)).length;
@@ -990,11 +982,11 @@ function render() {
     // Unpaid entries: show projected balance dimmed
     let balHtml;
     if (e.paid) {
-      const bal = clearedBalanceMap[e.id];
+      const bal = balanceMap[e.id];
       const balClass = bal >= 0 ? 'pos' : 'neg';
       balHtml = `<div class="entry-balance ${balClass}">${fmt(bal)}</div>`;
     } else {
-      const proj = projectedBalanceMap[e.id];
+      const proj = balanceMap[e.id];
       const projClass = proj >= 0 ? 'pos' : 'neg';
       balHtml = `<div class="projected-label">projected</div><div class="entry-balance projected ${projClass}">${fmt(proj)}</div>`;
     }
@@ -1063,7 +1055,7 @@ function exportCSV() {
   let rows = [];
   // Write account definitions
   state.accounts.forEach(a => rows.push(['BILLTRACKER_ACCOUNT', a.id, a.name, a.starting.toFixed(2), '', '', '', '', '']));
-  rows.push(['Date','Note','Amount','Paid','SeriesId','Interval','AccountId','AccountName','Running Balance']);
+  rows.push(['Date','Note','Amount','Paid','SeriesId','Interval','AccountId','AccountName','Running Balance','ClearedDate']);
   // Per-account running balances
   const balTrackers = {};
   state.accounts.forEach(a => { balTrackers[a.id] = a.starting; });
@@ -1071,7 +1063,7 @@ function exportCSV() {
     if (balTrackers[e.accountId] === undefined) return;
     balTrackers[e.accountId] += e.amount;
     const acct = state.accounts.find(a => a.id === e.accountId);
-    rows.push([e.date, e.note, e.amount.toFixed(2), e.paid?'yes':'no', e.seriesId||'', e.interval||'', e.accountId, acct?.name||'', balTrackers[e.accountId].toFixed(2)]);
+    rows.push([e.date, e.note, e.amount.toFixed(2), e.paid?'yes':'no', e.seriesId||'', e.interval||'', e.accountId, acct?.name||'', balTrackers[e.accountId].toFixed(2), e.clearedDate||'']);
   });
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv'});
