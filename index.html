@@ -16,7 +16,7 @@
     --sub:      #7a90a8;
     --positive: #3ecf8e;
     --negative: #f26b6b;
-    --accent:   #4d9de0;
+    --accent:   #59b8ff;
     --warning:  #f5a623;
     --mono:     'JetBrains Mono', monospace;
     --sans:     'Inter', sans-serif;
@@ -31,9 +31,9 @@
   .account-selector { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 0; }
   .account-select {
     background: var(--bg); border: 1px solid var(--accent); border-radius: 8px;
-    color: var(--accent); font-family: var(--sans); font-size: 0.9rem; font-weight: 600;
+    color: var(--accent); font-family: var(--sans); font-size: 0.9rem; font-weight: 700;
     padding: 0.45rem 0.65rem; outline: none; -webkit-appearance: none; cursor: pointer;
-    flex: 1; min-width: 0; max-width: 160px;
+    flex: 1; min-width: 0; max-width: 180px; font-size: 1rem;
   }
   .account-select:focus { border-color: var(--accent); }
   .manage-btn {
@@ -69,7 +69,7 @@
   }
   .acct-balance-left { }
   .acct-balance-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sub); margin-bottom: 0.2rem; }
-  .acct-balance-name { font-size: 0.8rem; color: var(--muted); }
+  .acct-balance-name { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
   .acct-balance-val { font-family: var(--mono); font-size: 0.88rem; font-weight: 700; line-height: 1; }
   .acct-balance-val.pos { color: #ffffff; }
   .acct-balance-val.neg { color: var(--negative); }
