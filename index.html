@@ -169,6 +169,9 @@
   .entry-action-btn.del { color: var(--accent); }
   .entry-action-btn.del:active { color: var(--negative); }
   .empty-state { padding: 2.5rem 1rem; text-align: center; background: var(--surface); }
+  .show-more-row { padding: 0.875rem 1rem; text-align: center; background: var(--surface); border-top: 1px solid var(--border); }
+  .show-more-btn { background: none; border: 1px solid var(--accent); border-radius: 8px; color: var(--accent); font-family: var(--sans); font-size: 0.82rem; font-weight: 600; padding: 0.5rem 1.25rem; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .show-more-btn:active { background: var(--accent); color: #fff; }
   .empty-icon { font-size: 2rem; margin-bottom: 0.5rem; }
   .empty-title { font-size: 0.95rem; font-weight: 600; color: var(--sub); margin-bottom: 0.25rem; }
   .empty-hint { font-size: 0.78rem; color: var(--muted); }
@@ -466,6 +469,7 @@ const STORAGE_KEY = 'billtracker_v3';
 let state = { accounts: [], entries: [] };
 let activeAccountId = null;
 let activeFilter = 'all';
+let showAllUnpaid = false;
 let recurringOn = false;
 let formSign = -1;
 let editSign = -1;
@@ -564,6 +568,7 @@ function rebuildAccountSelect() {
 function switchAccount() {
   activeAccountId = document.getElementById('accountSelect').value;
   activeFilter = 'unpaid';
+  showAllUnpaid = false;
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.classList.toggle('active', btn.classList.contains('f-unpaid'));
   });
@@ -888,6 +893,7 @@ function applyRecurChoice(scope) {
 // ── FILTER ──
 function setFilter(f) {
   activeFilter = f;
+  showAllUnpaid = false;
   document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.classList.contains('f-' + f)));
   render();
 }
@@ -920,9 +926,9 @@ function render() {
   // Sort paid entries by cleared date, unpaid by due date
   // Paid entries come first (they've actually cleared), unpaid after
   const paidEntries   = acctEntries.filter(e => e.paid)
-    .sort((a,b) => (a.clearedDate||a.date||'0') < (b.clearedDate||b.date||'0') ? -1 : 1);
+    .sort((a,b) => (a.clearedDate||a.date||'0') > (b.clearedDate||b.date||'0') ? -1 : 1); // newest first
   const unpaidEntries = acctEntries.filter(e => !e.paid)
-    .sort((a,b) => (a.date||'0') < (b.date||'0') ? -1 : 1);
+    .sort((a,b) => (a.date||'0') < (b.date||'0') ? -1 : 1); // oldest first
 
   // Calculate running total: paid entries in cleared order first, then unpaid in due date order
   const balanceMap = {};
@@ -939,7 +945,26 @@ function render() {
 
   // Display sort: oldest first
   let displayed = [...acctEntries].sort((a,b) => { const da=a.date||'0'; const db=b.date||'0'; return da<db?-1:da>db?1:0; });
-  if (activeFilter === 'unpaid')  displayed = displayed.filter(e => !e.paid);
+  if (activeFilter === 'unpaid') {
+    displayed = displayed.filter(e => !e.paid);
+    // For open: default shows current month + next month, Show More reveals rest
+    if (!showAllUnpaid) {
+      const now = new Date();
+      const cutoffMonth = now.getMonth() === 11 ? 0 : now.getMonth() + 1; // next month
+      const cutoffYear  = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
+      const cutoffDate  = new Date(cutoffYear, cutoffMonth + 1, 0); // last day of next month
+      const cutoffISO   = cutoffDate.toISOString().slice(0, 10);
+      const visibleUnpaid  = displayed.filter(e => !e.date || e.date <= cutoffISO);
+      const hiddenCount    = displayed.length - visibleUnpaid.length;
+      displayed = visibleUnpaid;
+      // Store hidden count for Show More button
+      window._hiddenUnpaidCount = hiddenCount;
+    } else {
+      window._hiddenUnpaidCount = 0;
+    }
+  } else {
+    window._hiddenUnpaidCount = 0;
+  }
   if (activeFilter === 'paid')    displayed = displayed.filter(e => e.paid);
   if (activeFilter === 'pastdue') displayed = displayed.filter(e => isPastDue(e));
 
@@ -1021,6 +1046,14 @@ function render() {
       </div>
     </div>`;
   });
+  // Add Show More button for unpaid if there are hidden entries
+  if (activeFilter === 'unpaid' && window._hiddenUnpaidCount > 0) {
+    html += `<div class="show-more-row">
+      <button class="show-more-btn" onclick="showMoreUnpaid()">
+        Show ${window._hiddenUnpaidCount} more scheduled →
+      </button>
+    </div>`;
+  }
   ledger.innerHTML = html;
 }
 
@@ -1228,6 +1261,12 @@ function swipeEnd(e, id) {
     // Swipe left = delete
     deleteEntry(id);
   }
+}
+
+// ── SHOW MORE ──
+function showMoreUnpaid() {
+  showAllUnpaid = true;
+  render();
 }
 
 // ── TOAST ──
